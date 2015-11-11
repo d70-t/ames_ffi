@@ -3,7 +3,10 @@ Test corrections which are applied to ames files
 """
 from unittest import TestCase
 from ames import AmesRepairTool
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import os
 
 class _CorrectionTestBase(TestCase):
