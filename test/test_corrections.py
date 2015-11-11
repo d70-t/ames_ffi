@@ -28,9 +28,6 @@ class _CorrectionTestBase(TestCase):
         badness, _ = os.path.splitext(filename)
         return badness
     def test_correction_output_matches(self):
-        """
-        Check if output matches reference file. 
-        """
         test_out = StringIO()
         repair_tool = AmesRepairTool()
         with open(self.testfile) as inp:
