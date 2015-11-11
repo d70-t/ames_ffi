@@ -5,6 +5,7 @@ python:
     - 3.4
     - 3.5
     - nightly
+sudo: false
 install:
     - pip install coverage
     - pip install codecov
