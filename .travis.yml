@@ -7,8 +7,7 @@ python:
     - nightly
 sudo: false
 install:
-    - pip install coverage
-    - pip install codecov
+    - pip install -r test-requirements.txt
 script:
     - nosetests --with-coverage --cover-package=ames --cover-branches test
     - coverage xml
