@@ -46,9 +46,31 @@ def repair_nlhead(inp):
     else:
         return inp, 0
 
+
+def repair_bad_nan(inp):
+    """
+    Fixes wrong nan values
+    """
+    nan_values = [x.lower() for x in ['--', 'nan', '#WERT!']]
+    lines = inp.split('\n')
+    nlhead = int(lines[0].split()[0])
+    vmiss = lines[11].split()
+    badness = [0]
+    def correct_nan(line):
+        values = line.lower().split()
+        for i in xrange(1,len(values)):
+            if values[i] in nan_values:
+                badness[0] += 1
+                values[i] = vmiss[i-1]
+        return ' '.join(values)
+    header = lines[:nlhead]
+    data = [correct_nan(line) for line in lines[nlhead:]]
+    return '\n'.join(header + data), badness[0] * 0.1
+
 REPAIR_FUNCTIONS = [
     ('tabs', repair_tabs),
     ('wrong_nlhead', repair_nlhead),
+    ('bad_nan', repair_bad_nan),
     ]
 
 class AmesRepairTool(object):
