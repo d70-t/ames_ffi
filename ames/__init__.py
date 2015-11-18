@@ -2,6 +2,8 @@
 ames helper tools
 """
 
+import itertools
+
 def isreal(string):
     try:
         float(string)
@@ -58,12 +60,23 @@ class AmesRepairTool(object):
         Loads a broken input file and repairs it.
         """
         inp = input_file.read()
-        repaired = []
-        for repair_name, repair_function in REPAIR_FUNCTIONS:
-            inp, score = repair_function(inp)
-            if score > 0:
-                repaired.append(repair_name)
-        return RepairResult(inp, repaired)
+
+        def apply_repair(repair_functions, inp):
+            repaired = []
+            for repair_name, repair_function in repair_functions:
+                inp, score = repair_function(inp)
+                if score > 0:
+                    repaired.append(repair_name)
+                    print "badness of ", repair_name, ":", score
+            return inp, repaired
+
+        results = [apply_repair(functions, inp)
+                   for functions
+                   in itertools.permutations(REPAIR_FUNCTIONS)]
+        results = sorted(results,
+                         key=lambda (out, repaired): len(repaired))
+        out, repaired = results[0]
+        return RepairResult(out, repaired)
 
 
 class RepairResult(object):
