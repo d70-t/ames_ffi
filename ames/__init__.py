@@ -91,11 +91,24 @@ class AmesRepairTool(object):
                     repaired.append(repair_name)
             return inp, repaired
 
+        def check_if_no_repair_needed(inp):
+            out, repaired = apply_repair(REPAIR_FUNCTIONS, inp)
+            return len(repaired) == 0
+
         results = [apply_repair(functions, inp)
                    for functions
                    in itertools.permutations(REPAIR_FUNCTIONS)]
         results = sorted(results,
                          key=lambda (out, repaired): len(repaired))
+
+        min_repairs = len(results[0][1])
+        results = [(out, repaired)
+                   for out, repaired in results
+                   if len(repaired) == min_repairs
+                   and check_if_no_repair_needed(out)]
+
+        if len(results) == 0:
+            raise ValueError("Hmmm... Not even I could repair the file...")
         out, repaired = results[0]
         print "repaired:", repaired
         return RepairResult(out, repaired)
