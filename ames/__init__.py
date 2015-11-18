@@ -67,10 +67,28 @@ def repair_bad_nan(inp):
     data = [correct_nan(line) for line in lines[nlhead:]]
     return '\n'.join(header + data), badness[0] * 0.1
 
+def repair_nlhead_from_header_consistency(inp):
+    lines = inp.split('\n')
+    nlhead, rest = lines[0].split(None, 1)
+    nlhead = int(nlhead)
+    nvalues = int(lines[9])
+    nspecial_comments = int(lines[12+nvalues])
+    nnormal_comments = int(lines[12+nvalues+1+nspecial_comments])
+    nlhead2 = 12+nvalues+1+nspecial_comments+1+nnormal_comments
+    if nlhead != nlhead2:
+        # change is required
+        nlhead = nlhead2
+        lines[0] = '%d %s'%(nlhead, rest)
+        return '\n'.join(lines), 10
+    else:
+        return inp, 0
+
+
 REPAIR_FUNCTIONS = [
     ('tabs', repair_tabs),
     ('wrong_nlhead', repair_nlhead),
     ('bad_nan', repair_bad_nan),
+    ('wrong_nlhead', repair_nlhead_from_header_consistency),
     ]
 
 class AmesRepairTool(object):

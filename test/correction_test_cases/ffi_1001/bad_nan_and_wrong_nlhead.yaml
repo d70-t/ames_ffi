@@ -1,0 +1,4 @@
+---
+expect_corrections:
+  - wrong_nlhead
+  - bad_nan
