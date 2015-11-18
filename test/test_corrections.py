@@ -36,6 +36,13 @@ class _CorrectionTestBase(TestCase):
         with open(self.testfile) as inp:
             repaired = repair_tool.repair(inp)
         repaired.write_to(test_out)
+        print test_out.getvalue()
+        # a second repair pass must return 0 corrections
+        test_out.seek(0)
+        repaired2 = repair_tool.repair(test_out)
+        self.assertEqual(0,
+                         len(repaired2.detected_badnesses),
+                         "second repair pass yielded a correction")
         with open(self.reffile) as ref:
             self.assertMultiLineEqual(test_out.getvalue(), ref.read())
         self.assertEqual([self.badness_name], repaired.detected_badnesses)
