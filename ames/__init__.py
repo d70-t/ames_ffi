@@ -89,7 +89,6 @@ class AmesRepairTool(object):
                 inp, score = repair_function(inp)
                 if score > 0:
                     repaired.append(repair_name)
-                    print "badness of ", repair_name, ":", score
             return inp, repaired
 
         results = [apply_repair(functions, inp)
@@ -98,6 +97,7 @@ class AmesRepairTool(object):
         results = sorted(results,
                          key=lambda (out, repaired): len(repaired))
         out, repaired = results[0]
+        print "repaired:", repaired
         return RepairResult(out, repaired)
 
 
