@@ -8,6 +8,7 @@ try:
 except ImportError:
     from io import StringIO
 import os
+import yaml
 
 class _CorrectionTestBase(TestCase):
     # pylint: disable=too-many-public-methods
@@ -23,13 +24,19 @@ class _CorrectionTestBase(TestCase):
         """
         return self.testfile.replace('.ames', '.corrected.ames')
     @property
-    def badness_name(self):
+    def badness_names(self):
         """
         Name of the tested badness
         """
-        _, filename = os.path.split(self.testfile)
-        badness, _ = os.path.splitext(filename)
-        return badness
+        try:
+            with open(self.testfile.replace('.ames', '.yaml')) as info_file:
+                info = yaml.load(info_file)
+        except IOError:
+            _, filename = os.path.split(self.testfile)
+            badness, _ = os.path.splitext(filename)
+            return [badness]
+        else:
+            return info['expect_corrections']
     def test_correction_output_matches(self):
         test_out = StringIO()
         repair_tool = AmesRepairTool()
@@ -45,7 +52,8 @@ class _CorrectionTestBase(TestCase):
                          "second repair pass yielded a correction")
         with open(self.reffile) as ref:
             self.assertMultiLineEqual(test_out.getvalue(), ref.read())
-        self.assertEqual([self.badness_name], repaired.detected_badnesses)
+        self.assertEqual(set(self.badness_names),
+                         set(repaired.detected_badnesses))
 
 # discover test cases
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
