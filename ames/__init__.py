@@ -84,11 +84,27 @@ def repair_nlhead_from_header_consistency(inp):
         return inp, 0
 
 
+def repair_missing_vmiss(inp):
+    """
+    Fixes too few vmiss values
+    """
+    lines = inp.split('\n')
+    need = int(lines[9])
+    vmiss = lines[11].split()
+    if len(vmiss) != need:
+        to_add = need - len(vmiss)
+        vmiss += [vmiss[-1]] * to_add
+        lines[11] = ' '.join(vmiss)
+        return '\n'.join(lines), to_add
+
+    return '\n'.join(lines), 0
+
 REPAIR_FUNCTIONS = [
     ('tabs', repair_tabs),
     ('wrong_nlhead', repair_nlhead),
     ('bad_nan', repair_bad_nan),
     ('wrong_nlhead', repair_nlhead_from_header_consistency),
+    ('missing_vmiss', repair_missing_vmiss),
     ]
 
 class AmesRepairTool(object):
@@ -150,4 +166,3 @@ class RepairResult(object):
         Writes repaired data to given output file.
         """
         output_file.write(self._result)
-
